@@ -7,8 +7,8 @@ import { getDfsAnimations } from '../../pathfindingAlgorithms/dfs.js'
 import { getBfsAnimations } from '../../pathfindingAlgorithms/bfs.js'
 
 export default function Grid() {
-    const ROWS = 15;
-    const COLS = 30;
+    const [ROWS, setROWS] = useState(28)
+    const [COLS, setCOLS] = useState(62)
     const [grid, setGrid] = useState([[]])
     const [START_ROW, START_COL] = [7, 12]
     const [END_ROW, END_COL] = [12, 25]
@@ -16,11 +16,13 @@ export default function Grid() {
     const destination = [END_ROW, END_COL]
 
 
-
     const createGrid = useCallback(() => {
         const nodes = document.getElementsByClassName('node-anime')
+        const nodesPath = document.getElementsByClassName('node-path')
         for (let node of nodes) {
             node.classList.remove('anime-visited')
+        }
+        for (let node of nodesPath) {
             node.classList.remove('path')
         }
         const GRID = [];
@@ -41,14 +43,20 @@ export default function Grid() {
         setGrid([...GRID])
     }, [ROWS, COLS, START_COL, START_ROW, END_COL, END_ROW]);
 
-    const handleWalls = (event) => {
-        
+    const handleWalls = () => {
+
     }
 
     useEffect(() => {
         createGrid()
-    }, [createGrid])
-    
+
+        window.addEventListener('resize', (e) => {
+            setROWS(Math.floor(e.target.innerHeight / 28.9) - 9)
+            setCOLS(Math.floor(e.target.innerWidth / 28.9) - 4)
+        })
+
+    }, [createGrid, ROWS, COLS])
+
     const animateShortestPath = (shortestPath) => {
         for (let i = 0; i < shortestPath.length; i++) {
             const nodes = document.getElementsByClassName('node-path');
@@ -73,7 +81,7 @@ export default function Grid() {
         }
         setTimeout(() => {
             animateShortestPath(shortestPath);
-        }, (animations.length * 10) + 1000)
+        }, (animations.length * 10) + 500)
 
     }
 
@@ -89,33 +97,39 @@ export default function Grid() {
         }
         setTimeout(() => {
             animateShortestPath(shortestPath);
-        }, (animations.length * 10) + 1000)
+        }, (animations.length * 10) + 500)
     }
 
 
     return (
-        <div className='grid'>
-            {
-                grid.map((row, rowIdx) => {
-                    return (
-                        <div className="row-container" key={rowIdx}>
-                            {
-                                row.map((col, colIdx) => {
-                                    const { start, end, visited, isWall } = col
-                                    return (
-                                        <div className="col-container" key={colIdx} onMouseDown={handleWalls}>
-                                            <Node key={colIdx} id={`${rowIdx},${colIdx}`} src={start} dest={end} visited={visited} walls={isWall} />
-                                        </div>
-                                    )
-                                })
-                            }
-                        </div>
-                    )
-                })
-            }
-            <button className="begin" onClick={createGrid}>Reset</button>
-            <button className="begin" onClick={beginDfs}>DFS</button>
-            <button className="begin" onClick={beginBfs}>BFS</button>
+        <div className="container">
+            <div className="header">
+                <button className="begin" onClick={createGrid}>Reset</button>
+                <button className="begin" onClick={beginDfs}>DFS</button>
+                <button className="begin" onClick={beginBfs}>BFS</button>
+            </div>
+            <div className="grid-container">
+                <div className='grid'>
+                    {
+                        grid.map((row, rowIdx) => {
+                            return (
+                                <div className="row-container" key={rowIdx}>
+                                    {
+                                        row.map((col, colIdx) => {
+                                            const { start, end, visited, isWall } = col
+                                            return (
+                                                <div className="col-container" key={colIdx} onMouseDown={handleWalls}>
+                                                    <Node key={colIdx} id={`${rowIdx},${colIdx}`} src={start} dest={end} visited={visited} walls={isWall} />
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </div>
+                            )
+                        })
+                    }
+                </div>
+            </div>
         </div>
     )
 }
