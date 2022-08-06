@@ -3,7 +3,7 @@ import './node.scss'
 
 export default function Node({ src, dest, walls, id }) {
 
-    let addClass = 'node';
+    let addClass = 'node-anime';
 
     if (src) {
         addClass += ' start'
@@ -13,13 +13,11 @@ export default function Node({ src, dest, walls, id }) {
         addClass += ' walls'
     } else if (src && dest) {
         addClass += ' start end'
-    } else if (src && dest && walls) {
-        addClass += ' start end walls'
     }
 
     return (
-        <div className={addClass} >
-            <div className='node-anime'><div id={id} className='node-path'></div></div>
+        <div className='node'>
+            <div id={id} className={addClass}></div>
         </div>
     )
 }

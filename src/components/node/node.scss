@@ -8,80 +8,123 @@
 }
 
 @keyframes animateVisited {
-    0%{
+    0% {
         width: 0;
         height: 0;
         border-radius: 50%;
         transform: rotate(0deg);
-        background-color: #67edf7;
+        background-color: #A66CFF;
     }
-    20%{
-        background-color: #61c5ec;
+
+    20% {
+        background-color: #A66CFF;
     }
-    40%{
-        background-color: #58ade6;
+
+    40% {
+        background-color: #ae9cfe;
     }
-    60%{
-        background-color: #51a7ee;
+
+    60% {
+        background-color: #AFB4FF;
     }
-    80%{
-        background-color: #4ea9f3;
+
+    80% {
+        background-color: #AFB4FF;
     }
-    100%{
+
+    100% {
         width: 28.9px;
         height: 28.9px;
         border-radius: 50%;
         transform: rotate(360deg);
-        background-color: #67c2f7;
+        background-color: #93cbff;
     }
 }
 
 @keyframes path {
-    0%{
+    0% {
+        opacity: 0;
         width: 0;
         height: 0;
+        background-color: #073b4c;
+        border-radius: 0;
     }
-    100%{
+
+    20% {
+        opacity: 0.2;
+        background-color: #A66CFF;
+    }
+
+    40% {
+        opacity: 0.4;
+        background-color: #118ab2;
+    }
+
+    60% {
+        opacity: 0.6;
+        background-color: #06d6a0;
+    }
+
+    80% {
+        opacity: 0.8;
+        background-color: #ffd166;
+    }
+
+    100% {
+        opacity: 1;
+        border-radius: 50%;
+        background-color: #ef476f;
         width: 28.9px;
         height: 28.9px;
+    }
+}
+
+@keyframes walls {
+    0% {
+        border-radius: 0;
+        transform: scale(0);
+    }
+
+    100% {
+        border-radius: 50%;
+        transform: scale(1);
     }
 }
 
 .walls {
     background-color: #252525;
+    animation: walls 0.1s ease;
 }
 
 .start {
-    background-color: rgb(240, 86, 86);
+    background: url('https://img.icons8.com/fluency/48/000000/play.png');
+    background-size: cover;
+
 }
 
 .end {
-    background-color: rgb(124, 212, 97);
-}
-
-
-.visited {
-    background-color: #e7db29;
+    background: url('https://img.icons8.com/bubbles/100/000000/define-location.png');
+    background-size: cover;
 }
 
 .node-anime {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 28.9px;
+    height: 28.9px;
 }
+
 .anime-visited {
     width: 28.9px;
     height: 28.9px;
-    background-color: #67c2f7;
-    animation: animateVisited 0.4s ease;
-}
-
-.node-path {
-    width: 28.9px;
-    height: 28.9px;
+    background-color: #93cbff;
+    animation: animateVisited 0.5s ease;
 }
 
 .path {
-    background-color: #fdee65;
-    animation: path 1s ease;
+    width: 28.9px;
+    height: 28.9px;
+    background-color: #06d6a0;
+    animation: path 0.5s ease;
 }
