@@ -1,7 +1,7 @@
 import React from 'react'
 import './node.scss'
 
-export default function Node({ src, dest, walls, id }) {
+export default function Node({ src, dest, walls, id , divStyle}) {
 
     let addClass = 'node-anime';
 
@@ -16,8 +16,8 @@ export default function Node({ src, dest, walls, id }) {
     }
 
     return (
-        <div className='node'>
-            <div id={id} className={addClass}></div>
+        <div className='node' style={divStyle}>
+            <div id={id} className={addClass} ></div>
         </div>
     )
 }

@@ -11,8 +11,6 @@
     0% {
         width: 0;
         height: 0;
-        border-radius: 50%;
-        transform: rotate(0deg);
         background-color: #A66CFF;
     }
 
@@ -35,8 +33,6 @@
     100% {
         width: 28.9px;
         height: 28.9px;
-        border-radius: 50%;
-        transform: rotate(360deg);
         background-color: #93cbff;
     }
 }
@@ -47,7 +43,6 @@
         width: 0;
         height: 0;
         background-color: #073b4c;
-        border-radius: 0;
     }
 
     20% {
@@ -72,7 +67,6 @@
 
     100% {
         opacity: 1;
-        border-radius: 50%;
         background-color: #ef476f;
         width: 28.9px;
         height: 28.9px;
@@ -81,12 +75,10 @@
 
 @keyframes walls {
     0% {
-        border-radius: 0;
         transform: scale(0);
     }
 
     100% {
-        border-radius: 50%;
         transform: scale(1);
     }
 }
@@ -96,10 +88,15 @@
     animation: walls 0.1s ease;
 }
 
+.weight {
+    background: url('../../../public/weight.png');
+    background-size: cover;
+}
+
 .start {
     background: url('https://img.icons8.com/fluency/48/000000/play.png');
     background-size: cover;
-
+    
 }
 
 .end {
@@ -115,11 +112,11 @@
     height: 28.9px;
 }
 
-.anime-visited {
+.visited {
     width: 28.9px;
     height: 28.9px;
     background-color: #93cbff;
-    animation: animateVisited 0.5s ease;
+    animation: animateVisited 0.8s ease;
 }
 
 .path {
