@@ -1,30 +1,16 @@
-import React, { useState } from "react";
-import { useCallback } from "react";
-import { useEffect } from "react";
+import React, {useEffect, useCallback, useReducer} from "react";
 import Node from "../node/Node";
 import "./grid.scss";
 import { getDfsAnimations } from "../../pathfindingAlgorithms/dfs.js";
 import { getBfsAnimations } from "../../pathfindingAlgorithms/bfs.js";
 import { getDijkstraAnimations } from "../../pathfindingAlgorithms/dijkstra.js";
 import { Checkbox, InputLabel, Button, Select, MenuItem } from "@mui/material";
+import { boardState, INITIAL_STATE } from "../../stateManager/boardState";
+import { ACTION_TYPES } from "../../stateManager/stateActions";
 
 export default function Grid() {
-  const [ROWS, setROWS] = useState(Math.floor(window.innerHeight / 28.9) - 8);
-  const [COLS, setCOLS] = useState(Math.floor(window.innerWidth / 28.9) - 4);
-  const [disableControls, setDisableControls] = useState(false);
-  const [algorithm, setAlgorithm] = useState("null");
-  const [speed, setSpeed] = useState(8);
-  const [message, setMessage] = useState(null);
-  const [grid, setGrid] = useState([[]]);
-  const [removeWalls, setRemoveWalls] = useState(false);
-  const source = {
-    r: Math.floor((Math.floor(window.innerHeight / 28.9) - 8) / 2),
-    c: 5,
-  };
-  const target = {
-    r: Math.floor((Math.floor(window.innerHeight / 28.9) - 8) / 2),
-    c: Math.floor(window.innerWidth / 28.9) - 4 - 5,
-  };
+  const [state, dispatch] = useReducer(boardState, INITIAL_STATE);
+  const {ROWS, COLS, disableControls, algorithm, speed, message, grid, removeWalls, source, target} = state;
   const src = [source.r, source.c];
   const dest = [target.r, target.c];
 
@@ -55,7 +41,7 @@ export default function Grid() {
   };
 
   const createGrid = useCallback(() => {
-    setMessage(null);
+    dispatch({ type: ACTION_TYPES.MESSAGE, payload: null });
     resetBoard();
     const GRID = [];
     for (let row = 0; row < ROWS; row++) {
@@ -74,33 +60,45 @@ export default function Grid() {
         });
       }
     }
-    setGrid([...GRID]);
+    dispatch({ type: ACTION_TYPES.GRID, payload: [...GRID] });
   }, [ROWS, COLS, source.r, source.c, target.r, target.c]);
 
   const handleAlgorithm = () => {
-    setDisableControls(true);
-    setRemoveWalls(false);
+    dispatch({ type: ACTION_TYPES.DISABLE_CONTROLS, payload: true });
+    dispatch({ type: ACTION_TYPES.REMOVE_WALLS, payload: false });
     document.getElementById("walls-check").checked = false;
     document.getElementsByClassName("grid")[0].style.pointerEvents = "none";
     switch (algorithm) {
       case "dfs":
         resetAlgorithm();
-        setMessage("Depth First Search does not guarantee the shortest path.");
+        dispatch({
+          type: ACTION_TYPES.MESSAGE,
+          payload: "Depth First Search does not guarantee the shortest path.",
+        });
         beginDfs();
         break;
       case "bfs":
         resetAlgorithm();
-        setMessage(null);
+        dispatch({
+          type: ACTION_TYPES.MESSAGE,
+          payload: null,
+        });
         beginBfs();
         break;
       case "dijkstra":
         resetAlgorithm();
-        setMessage(null);
+        dispatch({
+          type: ACTION_TYPES.MESSAGE,
+          payload: null,
+        });
         beginDijkstra();
         break;
       default:
-        setDisableControls(false);
-        setMessage("Select an Algorithm to Continue!");
+        dispatch({ type: ACTION_TYPES.DISABLE_CONTROLS, payload: false });
+        dispatch({
+          type: ACTION_TYPES.MESSAGE,
+          payload: null,
+        });
     }
   };
 
@@ -108,15 +106,27 @@ export default function Grid() {
     createGrid();
 
     window.addEventListener("resize", (e) => {
-      setROWS(Math.floor(e.target.innerHeight / 28.9) - 9);
-      setCOLS(Math.floor(e.target.innerWidth / 28.9) - 4);
+      dispatch({
+        type: ACTION_TYPES.CHANGE_ROWS,
+        payload: Math.floor(e.target.innerHeight / 28.9) - 9,
+      });
+      dispatch({
+        type: ACTION_TYPES.CHANGE_COLS,
+        payload: Math.floor(e.target.innerWidth / 28.9) - 4,
+      });
     });
   }, [createGrid, ROWS, COLS]);
 
   const animateShortestPath = (shortestPath) => {
     if (shortestPath.length === 0) {
-      setMessage("No Path Exist From Source To Target!");
-      setDisableControls(false);
+      dispatch({
+        type: ACTION_TYPES.MESSAGE,
+        payload: "No Path Exist From source To target!",
+      });
+      dispatch({
+        type: ACTION_TYPES.DISABLE_CONTROLS,
+        payload: false,
+      });
       document.getElementsByClassName("grid")[0].style.pointerEvents = "auto";
       return;
     }
@@ -132,7 +142,10 @@ export default function Grid() {
     }
 
     setTimeout(() => {
-      setDisableControls(false);
+      dispatch({
+        type: ACTION_TYPES.DISABLE_CONTROLS,
+        payload: false,
+      });
       document.getElementsByClassName("grid")[0].style.pointerEvents = "auto";
       document.getElementById(dest[0] + "," + dest[1]).classList.add("path");
     }, shortestPath.length * speed * 3);
@@ -238,7 +251,12 @@ export default function Grid() {
 
     for (let r = 0; r < ROWS; r++) {
       for (let c = 0; c < COLS; c++) {
-        if (r === 0 || r === ROWS - 1 || c === 0 || c === COLS - 1) {
+        if (
+          r === 0 ||
+          r === ROWS - 1 ||
+          c === 0 ||
+          c === COLS - 1
+        ) {
           document.getElementById(r + "," + c).classList.add("walls");
           grid[r][c].isWall = true;
         }
@@ -253,7 +271,7 @@ export default function Grid() {
       document.getElementById(r + "," + c).classList.add("walls");
       grid[r][c].isWall = true;
     }
-    setGrid([...grid]);
+    dispatch({ type: ACTION_TYPES.GRID, payload: [...grid] });
   };
 
   const randomWeight = () => {
@@ -275,10 +293,10 @@ export default function Grid() {
       const r = randomIntFromInterval(0, ROWS - 1);
       const c = randomIntFromInterval(0, COLS - 1);
       if (grid[r][c].start || grid[r][c].end) continue;
-      grid[r][c].weight = 2
-      document.getElementById(r + "," + c).classList.add('weight'); 
+      grid[r][c].weight = 2;
+      document.getElementById(r + "," + c).classList.add("weight");
     }
-    setGrid([...grid]);
+    dispatch({ type: ACTION_TYPES.GRID, payload: [...grid] });
   };
 
   return (
@@ -321,7 +339,12 @@ export default function Grid() {
             id="demo-simple-select"
             value={algorithm}
             label="Algorithm"
-            onChange={(e) => setAlgorithm(e.target.value)}
+            onChange={(e) =>
+              dispatch({
+                type: ACTION_TYPES.ALGORITHM,
+                payload: e.target.value,
+              })
+            }
             disabled={disableControls}
           >
             <MenuItem value="null">Select An Algorithm</MenuItem>
@@ -331,7 +354,9 @@ export default function Grid() {
           </Select>
           <button
             className="begin"
-            style={{ backgroundColor: disableControls ? "#e63d3d" : "#4eaa4e" }}
+            style={{
+              backgroundColor: disableControls ? "#e63d3d" : "#4eaa4e",
+            }}
             disabled={disableControls}
             onClick={handleAlgorithm}
           >
@@ -360,7 +385,12 @@ export default function Grid() {
               id="demo-simple-select"
               value={speed}
               label="Algorithm"
-              onChange={(e) => setSpeed(e.target.value)}
+              onChange={(e) =>
+                dispatch({
+                  type: ACTION_TYPES.SPEED,
+                  payload: e.target.value,
+                })
+              }
               disabled={disableControls}
             >
               <MenuItem value={25}>Very Slow</MenuItem>
@@ -386,7 +416,12 @@ export default function Grid() {
               id="walls-check"
               sx={{ cursor: "pointer" }}
               disabled={disableControls}
-              onChange={(e) => setRemoveWalls(e.target.checked)}
+              onChange={(e) =>
+                dispatch({
+                  type: ACTION_TYPES.REMOVE_WALLS,
+                  payload: e.target.checked,
+                })
+              }
             />
           </div>
         </div>
